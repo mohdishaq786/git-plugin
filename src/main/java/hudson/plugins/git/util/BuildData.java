@@ -307,8 +307,9 @@ public class BuildData implements Action, Serializable, Cloneable {
     GitSCM.DescriptorImpl descriptor = getDescriptorImpl();
     String globalRegex = descriptor.getGlobalUrlRegEx();
 
+       // Use the default regex from the GitSCM class if globalRegex is null or empty
     if (globalRegex == null || globalRegex.isEmpty()) {
-        return "Global Regex is not set up";
+           globalRegex = descriptor.getDefaultGlobalUrlRegEx();
     }
     String[] regexps = globalRegex.split("&&&");
     for (String regex : regexps) {
@@ -320,21 +321,24 @@ public class BuildData implements Action, Serializable, Cloneable {
                 try {
                     return matcher.group("repo");
                 } catch (IllegalArgumentException | IllegalStateException e) {
-                    return "Failed to extract 'repo' group";
+                    // Return null if there is an error extracting the 'repo' group
+                    return null;
                 }
             } else {
-                return "Regex must contain a named group 'repo'";
+                // Return null if regex does not contain the 'repo' named group
+                return null;
             }
         }
     }
-    return "No matching repository name found in the URL";
+       // Return null if no matching repository name is found in the URL
+       return null;
     }
 
     public String getOrganizationName(String remoteUrl) {
     GitSCM.DescriptorImpl descriptor = getDescriptorImpl();
     String globalRegex = descriptor.getGlobalUrlRegEx();
     if (globalRegex == null || globalRegex.isEmpty()) {
-        return "Global Regex is not set up";
+        globalRegex = descriptor.getDefaultGlobalUrlRegEx();
     }
     String[] regexps = globalRegex.split("&&&");
     for (String regex : regexps) {
@@ -347,14 +351,18 @@ public class BuildData implements Action, Serializable, Cloneable {
                 try {
                     return matcher.group("org");
                 } catch (IllegalArgumentException | IllegalStateException e) {
-                    return "Regex must contain a named group 'org'";
+                    // Return null if there is an error extracting the 'org' group
+                    return null;
+
                 }
             } else {
-                return "Organization name not found in the URL";
+                // Return null if regex does not contain the 'org' named group
+                return null;
             }
         }
     }
-    return "No matching organization name found in the URL";
+    // Return null if no matching org name is found in the URL
+        return null;
 
 }
 
